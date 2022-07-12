@@ -1,11 +1,11 @@
 // create variable to hold db connection
 let db;
-const request = indexedDB.open("budget_tracker", 1);
+const request = indexedDB.open("dinero_tracker", 1);
 
 // this event will emit if the database version changes (nonexistant to version 1, v1 to v2, etc.)
 request.onupgradeneeded = function (event) {
   const db = event.target.result;
-  db.createObjectStore("new_transaction", { autoIncrement: true });
+  db.createObjectStore("new_tran", { autoIncrement: true });
 };
 
 // upon a successful
@@ -14,7 +14,7 @@ request.onsuccess = function (event) {
   db = event.target.result;
   // check if app is online.
   if (navigator.onLine) {
-    uploadTransaction();
+    uploadTran();
   }
 };
 
@@ -24,22 +24,21 @@ request.onerror = function (event) {
 
 // This function will be executed if we attempt to submit a transaction and there's no internet connection
 function saveRecord(record) {
-  // open a new transaction with the database with read and write permissions
-  const transaction = db.transaction(["new_transaction"], "readwrite");
+ const transaction = db.transaction(["new_tran"], "readwrite");
 
   // access the object store for new transaction
-  const transactionObjectStore = transaction.objectStore("new_transaction");
+  const transactionObjectStore = transaction.objectStore("new_tran");
 
   // add record to your store with add method
   transactionObjectStore.add(record);
 }
 
-function uploadTransaction() {
+function uploadTran() {
   // open a transaction on your db
-  const transaction = db.transaction(["new_transaction"], "readwrite");
+  const transaction = db.transaction(["new_tran"], "readwrite");
 
   // access your object store
-  const transactionObjectStore = transaction.objectStore("new_transaction");
+  const transactionObjectStore = transaction.objectStore("new_tran");
 
   // get all transactions from store and set to a variable
   const getAll = transactionObjectStore.getAll();
@@ -63,10 +62,10 @@ getAll.onsuccess = function () {
           throw new Error(serverResponse);
         }
         // open one more transaction
-        const transaction = db.transaction(["new_transaction"], "readwrite");
+        const transaction = db.transaction(["new_tran"], "readwrite");
         // access the  transaction object store
         const transactionObjectStore =
-          transaction.objectStore("new_transaction");
+          transaction.objectStore("new_tran");
         // clear all items in your store
         transactionObjectStore.clear();
 
@@ -79,4 +78,4 @@ getAll.onsuccess = function () {
 };
 
 // listen for app coming back online
-window.addEventListener("online", uploadTransaction);
+window.addEventListener("online", uploadTran);
